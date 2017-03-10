@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Remote</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<link rel="stylesheet" type="text/css" href="rangeslider.css">
+	<link rel="stylesheet" type="text/css" href="index.css">
+</head>
+<body>
+	<div id="container">
+		<input 
+			type="range"
+			id="left"
+			min="-2"
+			max="2"
+			step="1"
+			value="0"
+			data-orientation="vertical">
+		<div id="space"></div>
+		<input
+			type="range"
+			id="right"
+			min="-2"
+			max="2"
+			step="1"
+			value="0"
+			data-orientation="vertical">
+	</div>
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="rangeslider.js"></script>
+	<script type="text/javascript" src="index.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+body {
+	padding: 0 30px;
+	height: 95vh;
+}
+#container {
+	display: flex;
+	height: 100%;
+}
+input {
+	width: 100px
+}
+#space {
+	flex: 1;
+}
+.rangeslider, .rangeslider__handle {
+	width: 50px;
+}
+.rangeslider__handle {
+	height: 50px;
+	left: 0px !important;
+}

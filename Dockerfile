@@ -8,3 +8,4 @@ RUN ln -s /usr/bin/pip-3.2 /usr/bin/pip3
 RUN apt-get install python-picamera 
 RUN apt-get -y install libraspberrypi-bin
 RUN apt-get -y install python-rpi.gpio
+RUN apt-get -y install python3-rpi.gpio

@@ -9,4 +9,4 @@ RUN apt-get install python-picamera
 RUN apt-get -y install libraspberrypi-bin
 RUN apt-get -y install python-rpi.gpio
 RUN apt-get -y install python3-rpi.gpio
-RUN pip3 install flash
+RUN pip3 install flask

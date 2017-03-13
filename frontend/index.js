@@ -1,9 +1,9 @@
-var $element = $('input[type="range"]');
-
-$element
-  .rangeslider({
-    polyfill: false
-  })
-  .on('input', function() {
-    // updateOutput($output[0], this.value);
-  });
+['e', 'f', 'j', 'i'].forEach(key => {
+    Mousetrap.bind(key, () => {
+        console.log(key)
+    }, 'keydown');
+    // Mousetrap.bind(key, () => {
+    //     keysDown[key] = false;
+    //     switchOff(keyDirections[key]);
+    // }, 'keyup');
+});

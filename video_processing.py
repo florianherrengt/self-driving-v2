@@ -11,7 +11,8 @@ while True:
     if a != -1 and b != -1:
         jpg = bytes[a:b+2]
         bytes = bytes[b+2:]
-        i = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
-        cv2.imshow('i', i)
+        video = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
+        video = cv2.adaptiveThreshold(video, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,15,3)
+        cv2.imshow('video', video)
         if cv2.waitKey(1) == 27:
             exit(0)

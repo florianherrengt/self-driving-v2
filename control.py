@@ -19,26 +19,29 @@ all_pins = left_pins + right_pins
 GPIO.setup(all_pins, GPIO.OUT)
 GPIO.output(all_pins, GPIO.LOW)
 
-left_pwm = GPIO.PWM(left_speed,100)
-right_pwm = GPIO.PWM(right_speed,100)
+left_pwm = GPIO.PWM(left_speed, 100)
+right_pwm = GPIO.PWM(right_speed, 100)
 left_pwm.start(0)
 right_pwm.start(0)
 
+
 def set_movement(enabled, side, direction):
-	if side == 'left':
-		GPIO.output(left_pins, GPIO.LOW)
-	else:
-		GPIO.output(right_pins, GPIO.LOW)
-	if direction == 'forward':
-		pin = left_forward if side == 'left' else right_forward
-	else:
-		pin = left_backward if side == 'left' else right_backward
-	status = GPIO.HIGH if enabled else GPIO.LOW
-	GPIO.output(pin, status)
+    if side == 'left':
+        GPIO.output(left_pins, GPIO.LOW)
+    else:
+        GPIO.output(right_pins, GPIO.LOW)
+    if direction == 'forward':
+        pin = left_forward if side == 'left' else right_forward
+    else:
+        pin = left_backward if side == 'left' else right_backward
+    status = GPIO.HIGH if enabled else GPIO.LOW
+    GPIO.output(pin, status)
+
 
 def set_speed(direction, percent):
-	pwm = left_pwm if direction == 'left' else right_pwm
-	pwm.ChangeDutyCycle(percent)
+    pwm = left_pwm if direction == 'left' else right_pwm
+    pwm.ChangeDutyCycle(percent)
+
 
 set_speed('left', 100)
 set_speed('rigth', 100)
@@ -91,5 +94,4 @@ set_speed('right', 100)
 sleep(5)
 
 GPIO.output(all_pins, GPIO.LOW)
-
 GPIO.cleanup()

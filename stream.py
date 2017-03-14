@@ -5,7 +5,7 @@ import socketserver
 from threading import Condition
 from http import server
 
-PAGE="""\
+PAGE = """\
 <html>
 <head>
 <title>picamera MJPEG streaming demo</title>
@@ -16,6 +16,7 @@ PAGE="""\
 </body>
 </html>
 """
+
 
 class StreamingOutput(object):
     def __init__(self):
@@ -33,6 +34,7 @@ class StreamingOutput(object):
                 self.condition.notify_all()
             self.buffer.seek(0)
         return self.buffer.write(buf)
+
 
 class StreamingHandler(server.BaseHTTPRequestHandler):
     def do_GET(self):
@@ -52,7 +54,9 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_header('Age', 0)
             self.send_header('Cache-Control', 'no-cache, private')
             self.send_header('Pragma', 'no-cache')
-            self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
+            self.send_header(
+                'Content-Type',
+                'multipart/x-mixed-replace; boundary=FRAME')
             self.end_headers()
             try:
                 while True:
@@ -73,9 +77,11 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_error(404)
             self.end_headers()
 
+
 class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
     allow_reuse_address = True
     daemon_threads = True
+
 
 with picamera.PiCamera() as camera:
     output = StreamingOutput()

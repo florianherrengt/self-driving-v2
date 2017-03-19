@@ -1,5 +1,8 @@
 import RPi.GPIO as GPIO
-from time import sleep
+import atexit
+from http import server
+import socketserver
+from urllib.parse import urlparse, parse_qs
 
 left_forward = 17
 left_backward = 27
@@ -25,73 +28,64 @@ left_pwm.start(0)
 right_pwm.start(0)
 
 
-def set_movement(enabled, side, direction):
-    if side == 'left':
-        GPIO.output(left_pins, GPIO.LOW)
-    else:
-        GPIO.output(right_pins, GPIO.LOW)
-    if direction == 'forward':
-        pin = left_forward if side == 'left' else right_forward
-    else:
-        pin = left_backward if side == 'left' else right_backward
-    status = GPIO.HIGH if enabled else GPIO.LOW
-    GPIO.output(pin, status)
+def exit_handler():
+    GPIO.output(all_pins, GPIO.LOW)
+    GPIO.cleanup()
 
 
-def set_speed(direction, percent):
-    pwm = left_pwm if direction == 'left' else right_pwm
-    pwm.ChangeDutyCycle(percent)
+def set_movement(enabled, side, direction, percent):
+    try:
+        pwm = left_pwm if direction == 'left' else right_pwm
+        pwm.ChangeDutyCycle(percent)
+        if side == 'left':
+            GPIO.output(left_pins, GPIO.LOW)
+        else:
+            GPIO.output(right_pins, GPIO.LOW)
+        if direction == 'forward':
+            pin = left_forward if side == 'left' else right_forward
+        else:
+            pin = left_backward if side == 'left' else right_backward
+        status = GPIO.HIGH if enabled else GPIO.LOW
+        GPIO.output(pin, status)
+    except ValueError:
+        print(ValueError)
+        exit_handler()
 
 
-set_speed('left', 100)
-set_speed('rigth', 100)
+class StreamingHandler(server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        url = urlparse(self.path)
+        if url.path != '/':
+            self.send_response(200)
+            self.end_headers()
+            return
+        query = parse_qs(url.query)
+        direction = query['direction'][0]
+        side = query['side'][0]
+        enabled = query['enabled'][0] == 'true'
+        speed = int(query['speed'][0])
+        content = 'direction: {}\n'\
+            'side: {}\n'\
+            'enabled: {}\n'\
+            'speed: {}'.format(direction, side, enabled, speed).encode('utf-8')
+        self.send_response(200)
+        self.send_header('Age', 0)
+        self.send_header('Cache-Control', 'no-cache, private')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Content-Type', 'text/html')
+        self.send_header('Content-Length', len(content))
+        self.end_headers()
+        set_movement(enabled, side, direction, speed)
+        self.wfile.write(content)
 
-# set_movement(True, 'left', 'forward')
-# sleep(1)
-# set_movement(False, 'left', 'forward')
-# set_movement(True, 'left', 'backward')
-# sleep(1)
-# set_movement(False, 'left', 'backward')
-# set_movement(True, 'right', 'forward')
-# sleep(1)
-# set_movement(False, 'right', 'forward')
-# set_movement(True, 'right', 'backward')
-# sleep(1)
-# set_movement(False, 'right', 'backward')
 
-# set_movement(True, 'right', 'forward')
-# set_movement(True, 'left', 'forward')
-# sleep(2)
-# set_movement(True, 'right', 'backward')
-# set_movement(True, 'left', 'backward')
-# sleep(2)
+class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
+    allow_reuse_address = True
+    daemon_threads = True
 
-# set_movement(True, 'left', 'forward')
-# sleep(1)
-# set_movement(False, 'left', 'forward')
-# set_movement(True, 'left', 'backward')
-# sleep(1)
-# set_movement(False, 'left', 'backward')
-# set_movement(True, 'right', 'forward')
-# sleep(1)
-# set_movement(False, 'right', 'forward')
-# set_movement(True, 'right', 'backward')
-# sleep(1)
-# set_movement(False, 'right', 'backward')
 
-set_movement(True, 'right', 'forward')
-set_movement(True, 'left', 'forward')
-set_speed('left', 50)
-set_speed('right', 50)
-sleep(5)
-set_speed('left', 100)
-set_speed('right', 100)
-sleep(5)
-set_speed('right', 25)
-sleep(5)
-set_speed('left', 25)
-set_speed('right', 100)
-sleep(5)
+address = ('0.0.0.0', 8000)
+server = StreamingServer(address, StreamingHandler)
+server.serve_forever()
 
-GPIO.output(all_pins, GPIO.LOW)
-GPIO.cleanup()
+atexit.register(exit_handler)

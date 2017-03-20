@@ -33,10 +33,11 @@ def exit_handler():
     GPIO.cleanup()
 
 
-def set_movement(enabled, side, direction, percent):
+def set_movement(enabled, side, direction, speed):
+    print(side == 'left')
     try:
-        pwm = left_pwm if direction == 'left' else right_pwm
-        pwm.ChangeDutyCycle(percent)
+        pwm = left_pwm if side == 'left' else right_pwm
+        pwm.ChangeDutyCycle(speed)
         if side == 'left':
             GPIO.output(left_pins, GPIO.LOW)
         else:
@@ -53,6 +54,14 @@ def set_movement(enabled, side, direction, percent):
 
 
 class StreamingHandler(server.BaseHTTPRequestHandler):
+    def do_OPTIONS(self):
+        self.send_response(200, "ok")
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+        
     def do_GET(self):
         url = urlparse(self.path)
         if url.path != '/':
@@ -73,6 +82,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
         self.send_header('Cache-Control', 'no-cache, private')
         self.send_header('Pragma', 'no-cache')
         self.send_header('Content-Type', 'text/html')
+        self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Content-Length', len(content))
         self.end_headers()
         set_movement(enabled, side, direction, speed)

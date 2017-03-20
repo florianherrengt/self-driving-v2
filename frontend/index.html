@@ -7,9 +7,19 @@
 	<link rel="stylesheet" type="text/css" href="index.css">
 </head>
 <body>
-
-	<!-- <script type="text/javascript" src="jquery.js"></script> -->
-	<script type="text/javascript" src="mousetrap.min.js"></script>
+	<input 
+		type="range"
+		min="-100"
+		max="100"
+		step="20"
+		value="0">
+	<div id="controls">
+		<button type="button" id="stop">STOP</button>
+		<button type="button" id="go">GO</button>
+	</div>
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="rangeslider.js"></script>
+	<script type="text/javascript" src="fetch.js"></script>
 	<script type="text/javascript" src="index.js"></script>
 </body>
 </html>
